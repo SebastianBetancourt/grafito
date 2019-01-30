@@ -4,16 +4,66 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>grafito</title>
-    <style> body {padding: 0; margin: 0;} </style>
+    <link rel="stylesheet" href="./src/style.css">
     <script src="./lib/p5.min.js"></script>
     <script src="./lib/p5.dom.min.js"></script>
     <script src="./lib/math.min.js"></script>
 
+    <script src="./src/Matrix.js"></script>
     <script src="./src/Graph.js"></script>
     <script src="./src/GraphRepresentation.js"></script>
     <script src="./src/IO.js"></script>
     <script src="./src/sketch.js"></script>
   </head>
   <body>
+    <div id='new'>
+      <div style="display: flex; flex-direction: column;" onclick="event.stopPropagation()">
+        <label><input type="radio" name="graphType" id="undirected" class="graphTypeRadio">blank undirected graph</label>
+        <label><input type="radio" name="graphType" id="directed" class="graphTypeRadio">blank directed graph</label>
+        <label style="display: flex;"><input type="radio" name="graphType" id="complete" class="graphTypeRadio">complete <div class="mathTypo"> K </div>
+          <input type="text" id="completeField" class="graphTypeField"></label>
+        <label style="display: flex;"><input type="radio" name="graphType" id="cycle" class="graphTypeRadio">cycle <div class="mathTypo"> C </div>
+          <input type="text" id="cycleField" class="graphTypeField"></label>
+        <label style="display: flex;"><input type="radio" name="graphType" id="wheel" class="graphTypeRadio">wheel <div class="mathTypo"> W </div>
+         <input type="text" id="wheelField" class="graphTypeField"></label>
+        <label style="display: flex;"><input type="radio" name="graphType" id="bipartite" class="graphTypeRadio">complete bipartite <div class="mathTypo"> K 
+         <input type="text" id="set1" class="graphTypeField">,
+         <input type="text" id="set2" class="graphTypeField">
+        </div></label>
+        <button type="button" id="generate" style="width: 65px">generate</button>
+      </div>
+    </div>
+
+    <div id="fileOpener">
+      <div onclick="event.stopPropagation()" style="display: flex;flex-direction: column;justify-content: center;align-items:center;">
+      <label for="fileinput">choose a *.graph file to load from:</label>
+        <div><input type="file" id="fileinput" name="fileinput" accept=".graph"></div>
+      </div>
+    </div>
+
+
+    <div id="info" >
+      <a id="toggleWMatrix" style="font-size: 7pt" href="javascript:toggleWMatrix()">[hide weight matrix]</a>
+       <div id="wSection">
+        <input type="checkbox" id="showWeights" onclick="updateDrawWeights()"><label for="showWeights" id="showWeightsLabel" style="font-size: 8pt">show weights</label><br>
+       <span id="wMatrix"></span>
+      </div>
+      <div style="min-height: 20pt"></div>
+      <a id="toggleAdjMatrix" style="font-size: 7pt" href="javascript:toggleAdjMatrix()">[hide adjacency matrix]</a>
+      <span id="adjMatrix"></span>
+      <span id="status" style="min-height: 20px;"> </span>
+      <span>
+        <span style="right: 0%">
+          <span class="mathTypo">|V| = </span>
+          <span id="vertices"></span>
+        </span>
+        <span style="right: 100%">
+          <span class="mathTypo">|E| = </span>
+          <span id="edges"></span>
+        </span>
+      </span>
+      <span id="typeOfGraph"></span>
+      <span id="degreeSequence"></span>
+    </div>
   </body>
 </html>

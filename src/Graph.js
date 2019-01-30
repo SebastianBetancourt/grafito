@@ -1,57 +1,67 @@
 class Graph {
 
-	constructor(vertices){
+	constructor(vertices, weights = []){
+		if(vertices instanceof Matrix){
+			this.adjMatrix = vertices.copy();
+		}else{
+			this.adjMatrix = new Matrix(vertices);
+		}
+		if(weights instanceof Matrix){
+			this.wMatrix = weights.copy();
+		}else{
+			this.wMatrix = new Matrix(this.getVertixCount());
+		}
+		this.updateWeightMatrix();
+	}
 
-		// Si el parametro es un matriz cuadradada, se toma como matriz de adyacencia
-		if(Array.isArray(vertices) && vertices.length == vertices[0].length){
-			this.vertices = vertices.length;
-			this.adjMatrix = vertices;	
-		} else {
-			// Creacion matriz adyacencia
-			this.vertices = vertices;
-			this.adjMatrix = new Array(vertices);
-			for (var i = 0; i < vertices; i++) {
-				this.adjMatrix[i] = new Array(vertices);
-				for (var j = 0; j < vertices; j++) {
-					this.adjMatrix[i][j] = 0;
-				}
+	getVertixCount(){
+		return this.adjMatrix.getRowCount();	
+	}
+
+	getEdgeCount(){
+		var edges = 0;
+		for (var i = 0; i < this.getVertixCount(); i++) {
+			for (var j = 0; j < this.getVertixCount(); j++) {
+				edges += this.adjMatrix.getValue(i, j);
 			}
 		}
+		if(this instanceof UndirectedGraph){
+			edges = edges / 2;
+		}
+		return edges;
 	}
 
 	addVertix(){
-		this.adjMatrix.push(new Array(this.vertices).fill(0));
-		this.vertices++;
-		for (var j = 0; j < this.vertices; j++) {
-			this.adjMatrix[j].push(0);
-		}
+		this.adjMatrix.addRow();
+		this.adjMatrix.addColumn();
+		this.wMatrix.addRow(Infinity);
+		this.wMatrix.addColumn(Infinity);
 	}
 
 	removeVertix(vertix){
-		this.vertices--;
-		this.adjMatrix.splice(vertix, 1);
-		for (var j = 0; j < this.vertices; j++) {
-			this.adjMatrix[j].splice(vertix, 1);
-		}
+		this.adjMatrix.removeRow(vertix);
+		this.adjMatrix.removeColumn(vertix);
+		this.wMatrix.removeRow(vertix);
+		this.wMatrix.removeColumn(vertix);
 	}
 
 	addEdge(from, to){
-		this.adjMatrix[from][to]++;
+		this.adjMatrix.setValue(from, to, this.adjMatrix.getValue(from, to)+1);
 	}
 
 	removeEdge(from, to){
-		if(this.adjMatrix[from][to] > 0){
-			this.adjMatrix[from][to]--;	
+		if(this.adjMatrix.getValue(from, to) > 0){
+			this.adjMatrix.setValue(from, to, edges-1);	
 		}
 	}
 
 	areAdjacent(from, to){
-		return this.adjMatrix[from][to] > 0;
+		return this.adjMatrix.getValue(from, to) > 0;
 	}
 
 	hasLoops(){
-		for (var i = 0; i < this.vertices; i++) {
-			if(this.adjMatrix[i][i] > 0){
+		for (var i = 0; i < this.getVertixCount(); i++) {
+			if(this.adjMatrix.getValue(i, i) > 0){
 				return true;
 			}
 		}
@@ -59,9 +69,9 @@ class Graph {
 	}
 
 	hasMultipleEdges(){
-		for (var i = 0; i < this.vertices; i++) {
-			for (var j = 0; j < this.vertices; j++) {
-				if(this.adjMatrix[i][j] > 1){
+		for (var i = 0; i < this.getVertixCount(); i++) {
+			for (var j = 0; j < this.getVertixCount(); j++) {
+				if(this.adjMatrix.getValue(i, j) > 1){
 					return true;
 				}
 			}
@@ -69,15 +79,62 @@ class Graph {
 		return false;
 	}
 
-	getAdjMatrixInText(){
-		var matrix = "";
-		this.adjMatrix.map(row => {
-			let line = "";
-			row.forEach(value => {line += value + ",";});
-			return line.slice(0,-1);
-		}).forEach(cmprssdLine => {matrix += cmprssdLine + "\n";});
-		return matrix;
+	updateWeightMatrix(){
+		for (var i = 0; i < this.getVertixCount(); i++) {
+			for (var j = 0; j < this.getVertixCount(); j++) {
+
+				if(i == j){
+					if(this.adjMatrix.getValue(i,j) == 0){
+						this.wMatrix.setValue(i, j, 0);
+					}else if(this.adjMatrix.getValue(i,j) == 1){
+						this.wMatrix.setValue(i, j, 1);
+					}
+				}else if(this.wMatrix.getValue(i, j) == Infinity && this.adjMatrix.getValue(i,j) == 1){
+					this.wMatrix.setValue(i, j, 1);
+
+				}else if(this.wMatrix.getValue(i, j) != Infinity && this.adjMatrix.getValue(i,j) == 0){
+					this.wMatrix.setValue(i, j, Infinity);
+				}
+				if(this instanceof UndirectedGraph){
+					this.wMatrix.setValue(j, i, this.wMatrix.getValue(i, j));	
+				}
+
+			}
+		}
 	}
+
+	computeWarshall(n = this.getVertixCount()){
+		//predecessors
+		var firstPredecessor = new Matrix(this.getVertixCount());
+		for (var i = 0; i < this.getVertixCount(); i++) {
+				for (var j = 0; j < this.getVertixCount(); j++) {
+					if(this.wMatrix.getValue(i,j) == Infinity){
+						firstPredecessor.setValue(i, j, ' ');
+					}else{
+						firstPredecessor.setValue(i, j, i);
+					}
+				}
+			}
+		this.warshallPredecessors = [firstPredecessor]
+
+		this.warshalls = [this.wMatrix];
+
+		//algorithm
+		for (var k = 1; k < n; k++) {
+			for (var i = 0; i < this.getVertixCount(); i++) {
+				for (var j = 0; j < this.getVertixCount(); j++) {
+					if(this.warshalls[k-1].getValue(i,j) <= this.warshalls[k-1].getValue(i,k)+this.warshalls[k-1].getValue(i,k)){
+						this.warshalls[k].setValue(i,j, this.warshalls[k-1].getValue(i,j));
+						this.warshallPredecessors[k].setValue(i, j, this.warshallPredecessors[k-1].getValue(i,j));
+					}else{
+						this.warshalls[k].setValue(i,j, this.warshalls[k-1].getValue(i,k)+this.warshalls[k-1].getValue(i,k));
+						this.warshallPredecessors[k].setValue(i, j, this.warshallPredecessors[k-1].getValue(k,j));
+					}
+				}
+			}
+		}
+	}
+
 }
 
 class UndirectedGraph extends Graph {
@@ -86,28 +143,111 @@ class UndirectedGraph extends Graph {
 		super(vertices);
 	}
 
+	getType(){
+		if(super.hasMultipleEdges() && super.hasLoops()){
+			return 'pseudograph';
+		}else if (super.hasMultipleEdges()){
+			return 'multigraph';
+		}else{
+			return 'simple graph';
+		}
+	}
+
 	addEdge(from, to){
 		super.addEdge(from, to);
 		super.addEdge(to, from);
 	}
 
-	deleteEdge(from, to){
-		super.deleteEdge(from, to);
-		super.deleteEdge(to, from);
+	removeEdge(from, to){
+		super.removeEdge(from, to);
+		super.removeEdge(to, from);
 	}
 
-	isSimple(){
-		return !(super.hasMultipleEdges() || super.hasLoops());
+	getDegree(vertix){
+		var degree = 0;
+		for (var i = 0; i < this.getVertixCount(); i++) {
+				degree += this.adjMatrix.getValue(i, vertix);
+		}
+		return degree;
 	}
 
-	isMultigraph(){
-		return !super.hasLoops();
+	getDegreeSequence(){
+		var sequence = [];
+		for (var i = 0; i < this.getVertixCount(); i++) {
+			sequence.push(this.getDegree(i));
+		}
+		sequence.sort(function(a, b){return b-a});
+		return sequence;
 	}
 
-	isPseudograph(){
-		return true;
-	}
+	generateGraph(type, a = 1, b = 1){
+		var matrix = [];
+		for (var i = 0; i < a; i++) {
+			matrix.push(new Array(a));
+			for (var j = 0; j < a; j++) {
+				matrix[i][j] = 0;
+			}
+		}
+		switch(type){
+			case 'complete':
+				for (var i = 0; i < a; i++) {
+					for (var j = 0; j < a; j++) {
+						if(i != j){
+							matrix[i][j] = 1;
+						}
+					}
+				}
+				break;
+			case 'cycle':
+				for (var i = 0; i < a; i++) {
+					matrix[i][(i+1) % a] = 1;
+					var b = (i-1) % a;
+					if(b < 0){
+						b = a + b;
+					}
+					matrix[i][b] = 1;
+				}
+				break;
+			case 'wheel':
+				matrix.push(new Array(a+1));
+				for (var j = 0; j < a+1; j++) {
+					matrix[a][j] = 0;
+				}
 
+				for (var i = 0; i < a; i++) {
+					matrix[i][(i+1) % a] = 1;
+					var b = (i-1) % a;
+					if(b < 0){
+						b = a + b;	
+					}
+					matrix[i][b] = 1;
+
+					matrix[i][a] = 1;
+					matrix[a][i] = 1;
+				}
+				break;
+			case 'bipartite':
+				var matrix = [];
+				for (var i = 0; i < a+b; i++) {
+					matrix.push(new Array(a));
+					for (var j = 0; j < a+b; j++) {
+						matrix[i][j] = 0;
+					}
+				}
+				for (var i = 0; i < a+b; i++) {
+					for (var j = 0; j < i; j++) {
+						if (j < a && i >= a){
+							matrix[i][j] = 1;
+							matrix[j][i] = 1;
+						}
+					}
+				}
+				break;
+		}
+		this.adjMatrix = new Matrix(matrix);
+		this.updateWeightMatrix();
+		return this;
+}
 
 }
 
@@ -117,73 +257,44 @@ class DirectedGraph extends Graph {
 		super(vertices);
 	}
 
-	isSimple(){
-		return !(super.hasMultipleEdges() || super.hasLoops());
-	}
-
-	isMultigraph(){
-		return true;
-	}
-}
-
-function generateGraph(type, a = 1, b = 1){
-	var matrix = [];
-	for (var i = 0; i < a; i++) {
-		matrix.push(new Array(a));
-		for (var j = 0; j < a; j++) {
-			matrix[i][j] = 0;
+	getType(){
+		if(super.hasMultipleEdges()){
+			return 'directed multigraph';
+		}else{
+			return 'directed graph';
 		}
 	}
-	switch(type){
-		case 'complete':
-			for (var i = 0; i < a; i++) {
-				for (var j = 0; j < a; j++) {
-					if(i != j){
-						matrix[i][j] = 1;
-					}
-				}
-			}
-			break;
-		case 'cycle':
-			for (var i = 0; i < a; i++) {
-				matrix[i][(i+1) % a] = 1;
-				matrix[i][(i-1) % a] = 1;
-			}
-			break;
-		case 'wheel':
-			// initializing matrix
-			var matrix = [];
-			for (var i = 0; i < a+1; i++) {
-				matrix.push(new Array(a+1));
-				for (var j = 0; j < a+1; j++) {
-					matrix[i][j] = 0;
-				}
-			}
 
-			for (var i = 0; i < a; i++) {
-				matrix[i][(i+1) % a] = 1;
-				matrix[i][(i-1) % a] = 1;
-				matrix[i][a] = 1;
-				matrix[a][i] = 1;
-			}
-			break;
-		case 'bipartite':
-			var matrix = [];
-			for (var i = 0; i < a+b; i++) {
-				matrix.push(new Array(a));
-				for (var j = 0; j < a+b; j++) {
-					matrix[i][j] = 0;
-				}
-			}
-			for (var i = 0; i < a+b; i++) {
-				for (var j = 0; j < i; j++) {
-					if (j < a && i >= a){
-						matrix[i][j] = 1;
-						matrix[j][i] = 1;
-					}
-				}
-			}
-			break;
+	getDegree(vertix){
+		return this.getInDegree(vertix)+this.getOutDegree(vertix);
 	}
-	return new UndirectedGraph(matrix);
+
+	getInDegree(vertix){
+		var degree = 0;
+		for (var i = 0; i < this.getVertixCount(); i++) {
+			degree += this.adjMatrix.getValue(i, vertix);
+		}
+		return degree;
+	}
+
+	getOutDegree(vertix){
+		var degree = 0;
+		for (var i = 0; i < this.getVertixCount(); i++) {
+			degree += this.adjMatrix.getValue(vertix, i);
+		}
+		return degree;
+	}
+
+	getDegreeSequence(){
+		var sequence = [];
+		for (var i = 0; i < this.getVertixCount(); i++) {
+			sequence.push(this.getDegree(i));
+		}
+		sequence.sort(function(a, b){return b-a});
+		return sequence;
+	}
+
 }
+
+
+

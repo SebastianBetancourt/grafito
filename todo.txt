@@ -1,0 +1,23 @@
+//vertix class with a inner identifier 
+
+//visualize graph
+//drag nodes
+//add vertix
+//remove vertix
+//add edges
+//remove edges
+//background text that shows status
+//save graph to a csv
+given a graph, calculate:
+	//#edges
+	//#vertix
+	//node degree, indegree, outdegree
+	//degree sequence
+	//type
+matrix calc:
+	adj matrix to the n binary power
+	warshall algorithm
+//generate graph:
+	//k, c, w and k bipartite
+elementary subdivisions
+check isomorphism invariants

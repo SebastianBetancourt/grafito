@@ -1,15 +1,16 @@
 "use strict;"
 
 let graph = new DirectedGraph([
-	[0,2,3,4],
-	[5,2,6,8],
-	[2,1,0,0],
-	[0,0,3,2]]);
-let representation = new GraphRepresentation(graph);
+	[0,0,0,0],
+	[0,0,0,0],
+	[0,1,0,0],
+	[1,1,0,0]]);
+let representation = new GraphRepresentation();
 function setup() {
 	createCanvas(windowWidth-4,windowHeight-4);
 	representation.distributeVertices();
 	representation.drawGraph();
+	updateInfo();
 	initGUI();
 }
 
