@@ -12,6 +12,7 @@ class Graph {
 			this.wMatrix = new Matrix(this.getVertixCount());
 		}
 		this.updateWeightMatrix();
+		this.warshalls = [];
 	}
 
 	getVertixCount(){
@@ -51,7 +52,7 @@ class Graph {
 
 	removeEdge(from, to){
 		if(this.adjMatrix.getValue(from, to) > 0){
-			this.adjMatrix.setValue(from, to, edges-1);	
+			this.adjMatrix.setValue(from, to, this.adjMatrix.getValue(from, to)-1);	
 		}
 	}
 
@@ -108,10 +109,10 @@ class Graph {
 		var firstPredecessor = new Matrix(this.getVertixCount());
 		for (var i = 0; i < this.getVertixCount(); i++) {
 				for (var j = 0; j < this.getVertixCount(); j++) {
-					if(this.wMatrix.getValue(i,j) == Infinity){
-						firstPredecessor.setValue(i, j, ' ');
+					if(this.wMatrix.getValue(i,j) == Infinity || i == j){
+						firstPredecessor.setValue(i, j, '×');
 					}else{
-						firstPredecessor.setValue(i, j, i);
+						firstPredecessor.setValue(i, j, i+1);
 					}
 				}
 			}
@@ -120,27 +121,37 @@ class Graph {
 		this.warshalls = [this.wMatrix];
 
 		//algorithm
-		for (var k = 1; k < n; k++) {
+		for (var k = 1; k <= n; k++) {
+			this.warshalls.push(new Matrix(this.getVertixCount()));
+			this.warshallPredecessors.push(new Matrix(this.getVertixCount()));
 			for (var i = 0; i < this.getVertixCount(); i++) {
 				for (var j = 0; j < this.getVertixCount(); j++) {
-					if(this.warshalls[k-1].getValue(i,j) <= this.warshalls[k-1].getValue(i,k)+this.warshalls[k-1].getValue(i,k)){
+					if(this.warshalls[k-1].getValue(i,j) <= this.warshalls[k-1].getValue(i,k-1)+this.warshalls[k-1].getValue(k-1,j)){
 						this.warshalls[k].setValue(i,j, this.warshalls[k-1].getValue(i,j));
 						this.warshallPredecessors[k].setValue(i, j, this.warshallPredecessors[k-1].getValue(i,j));
 					}else{
-						this.warshalls[k].setValue(i,j, this.warshalls[k-1].getValue(i,k)+this.warshalls[k-1].getValue(i,k));
-						this.warshallPredecessors[k].setValue(i, j, this.warshallPredecessors[k-1].getValue(k,j));
+						this.warshalls[k].setValue(i, j, this.warshalls[k-1].getValue(i,k-1)+this.warshalls[k-1].getValue(k-1,j));
+						this.warshallPredecessors[k].setValue(i, j, this.warshallPredecessors[k-1].getValue(k-1,j));
 					}
 				}
 			}
 		}
 	}
 
+	elementarySubdivision(from, to){
+		this.removeEdge(from,to);
+		this.addVertix();
+		let lastVertix = this.getVertixCount()-1;
+		this.addEdge(from, lastVertix);
+		this.addEdge(lastVertix,to);
+	}
+
 }
 
 class UndirectedGraph extends Graph {
 
-	constructor(vertices = 1){
-		super(vertices);
+	constructor(vertices = 1, weights = []){
+		super(vertices, weights);
 	}
 
 	getType(){
@@ -247,14 +258,14 @@ class UndirectedGraph extends Graph {
 		this.adjMatrix = new Matrix(matrix);
 		this.updateWeightMatrix();
 		return this;
-}
+	}
 
 }
 
 class DirectedGraph extends Graph {
 
-	constructor(vertices = 1){
-		super(vertices);
+	constructor(vertices = 1, weights = []){
+		super(vertices, weights);
 	}
 
 	getType(){

@@ -39,6 +39,25 @@ function initGUI(){
 		button.mousePressed(edgeButtons[i][1]);
 		y += button.height+margin;
 	}
+
+	y += margin;
+
+	button = createButton('elementary subdivision');
+	button.position(margin, y);
+	button.mousePressed(elementarySubdivision);
+	y += button.height+margin;
+
+	y += margin;
+
+	let algoButtons = [['complement', complement], ['floyd-warshall', warshall]];
+
+	for (var i = 0; i < edgeButtons.length; i++) {
+		button = createButton(algoButtons[i][0]);
+		button.position(margin, y);
+		button.mousePressed(algoButtons[i][1]);
+		y += button.height+margin;
+	}
+
 }
 
 //button actions
@@ -310,7 +329,7 @@ function updateTableWMatrix(){
 				if(table[i][j] == 0 && i == j && graph.adjMatrix.getValue(Math.abs(i-1),Math.abs(j-1)) == 0){
 					attributes += 'class="tablecell wTable uneditable"';
 				}else if(table[i][j] != Infinity){
-					attributes += 'contenteditable="true" class="tablecell wTable" onkeypress="return keyPressedOnCell(event);';
+					attributes += 'contenteditable="true" class="tablecell wTable" onkeypress="return keyPressedOnCell(event);"';
 				}else{
 					attributes += 'class="tablecell wTable uneditable"';
 					table[i][j] = '∞';
@@ -370,6 +389,143 @@ function updateDrawWeights(){
 	representation.drawGraph();
 }
 
+function complement(){
+	var adjMatrix = new Matrix(graph.getVertixCount());
+	for (var i = 0; i < graph.getVertixCount(); i++) {
+		for (var j = 0; j < graph.getVertixCount(); j++) {
+			if(i == j){
+				adjMatrix.setValue(i,j, graph.adjMatrix.getValue(i, j));
+			}else if(graph.adjMatrix.getValue(i, j) > 0){
+				adjMatrix.setValue(i,j, 0);
+			} else {
+				adjMatrix.setValue(i,j, 1);
+			}
+		}
+	}
+
+	if(graph instanceof DirectedGraph){
+		graph = new DirectedGraph(adjMatrix);
+	}else{
+		graph = new UndirectedGraph(adjMatrix);
+	}
+
+	representation = new GraphRepresentation(representation.centers, representation.ids, representation.drawWeights);
+	representation.drawGraph();
+	updateInfo();
+}
+
+function warshall(){
+	var div = document.getElementById('warshall');
+	div.style.display = 'flex';
+	
+	if(!graph.warshalls || !graph.warshalls.length){
+		graph.computeWarshall();
+	}
+
+	function hideDiv(){		
+		div.style.display = 'none';
+		div.removeEventListener('click', hideDiv);
+	}
+	
+	var k = graph.getVertixCount();
+	
+	checkButtons();
+	printMatrices();
+
+	function checkButtons(){
+		if(k >= graph.getVertixCount()){
+			document.getElementById('next').disabled = true;
+		}else if(k <= 0){
+			document.getElementById('previous').disabled = true;
+		}else{
+			document.getElementById('next').disabled = false;
+			document.getElementById('previous').disabled = false;
+		}
+	}
+
+	function next(){
+		if(k < graph.getVertixCount()){
+			k++;
+			checkButtons();
+		}
+		printMatrices();
+	}
+
+	function previous(){
+		if(k > 0){
+			k--;
+			checkButtons();	
+		}
+		printMatrices();
+	}
+
+	function printMatrices(){
+
+		var warshall = [[' '].concat(representation.ids.slice(0, graph.getVertixCount()))];
+		var predecessor = [[' '].concat(representation.ids.slice(0, graph.getVertixCount()))];
+		for (var i = 0; i < graph.getVertixCount(); i++) {
+			warshall.push([representation.ids[i]]);
+			predecessor.push([representation.ids[i]]);
+			for (var j = 0; j < graph.getVertixCount(); j++) {
+				warshall[i+1].push(graph.warshalls[k].getValue(i, j));
+				predecessor[i+1].push(graph.warshallPredecessors[k].getValue(i,j));
+			}
+		}
+
+		document.getElementById('warshallLabel').innerHTML = 'D<sup>('+String(k)+')</sup>';
+		document.getElementById('predecessorsLabel').innerHTML = '&pi;<sup>('+String(k)+')</sup>';
+
+		var codeWarshall = '<table id="warshallTable" style="float:center">';
+		var codePredecessor = '<table id="predecessorsTable" style="float:center">';
+		for(var i = 0; i < graph.getVertixCount()+1; i++){
+			var rowWarshall = '<tr>';
+			var rowPredecessor = '<tr>';
+			for(var j = 0; j < graph.getVertixCount()+1; j++){
+				var cellWarshall = '<td class="tablecell"';
+				var cellPredecessor = '<td class="tablecell"';
+				if(i == 0 || j == 0){
+					cellWarshall = '<th class="tablecell"';
+					cellPredecessor = '<th class="tablecell"';
+				}
+				
+				cellWarshall += 'id="war_'+String(i)+":"+String(j)+'">';
+				cellPredecessor += 'id="pre_'+String(i)+":"+String(j)+'">';
+				if(warshall[i][j] == Infinity){
+					cellWarshall += '∞';
+				}else{
+					cellWarshall += String(warshall[i][j]);
+				}
+				if(predecessor[i][j] === undefined){
+					cellPredecessor += '×';
+				}else{
+					cellPredecessor += String(predecessor[i][j]);
+				}
+				cellWarshall += '</td>';
+				cellPredecessor += '</td>';
+				if(i == 0 || j == 0){
+					rowWarshall += '</th>';
+					rowPredecessor += '</th>';
+				}
+				rowWarshall += cellWarshall;
+				rowPredecessor += cellPredecessor;
+			}
+			rowWarshall += '</tr>';
+			rowPredecessor += '</tr>';
+			codeWarshall += rowWarshall;
+			codePredecessor += rowPredecessor;
+		}
+		codePredecessor += '</table>';
+		codeWarshall += '</table>';
+		document.getElementById('warshallMatrix').innerHTML = codeWarshall;
+		document.getElementById('predecessorsMatrix').innerHTML = codePredecessor;
+
+	}
+
+	document.getElementById('next').addEventListener('click', next);
+	document.getElementById('previous').addEventListener('click', previous);
+	div.addEventListener('click', hideDiv);
+}
+
 function addVertix(){
 	deactivateCurrentAction();
 	representation.addVertix();
@@ -382,6 +538,7 @@ var removingVertix = false;
 var removingEdge = false;
 var addingEdge = false;
 var dragging = false;
+var subdivisioning = false;
 
 function removeVertix(){
 	deactivateCurrentAction();
@@ -403,6 +560,14 @@ function removeEdge(){
 	deactivateCurrentAction();
 	removingEdge = true;
 	representation.status = 'removing edge';
+	representation.drawGraph();
+	updateInfo();
+}
+
+function elementarySubdivision(){
+	deactivateCurrentAction();
+	subdivisioning = true;
+	representation.status = 'elementary subdivisioning';
 	representation.drawGraph();
 	updateInfo();
 }
@@ -443,17 +608,29 @@ function mousePressed(event){
 				selectedVertix = -1;
 				deactivateCurrentAction();
 			}
+		}else if(subdivisioning){
+			if(selectedVertix == -1){
+				selectedVertix = vertix;
+				representation.highlightVertix(selectedVertix, 'Green');
+			}else{
+				var centers = [representation.centers[selectedVertix], representation.centers[vertix]];
+				representation.addVertix(vectorMean(centers));
+				graph.elementarySubdivision(selectedVertix, vertix);
+				representation.drawGraph();
+				selectedVertix = -1;
+				deactivateCurrentAction();
+			}
 		}else{
 			dragging = true;
 			offset = createVector(mouseX-representation.centers[vertix].x,mouseY-representation.centers[vertix].y);
 		}
-	}else if((removingEdge || removingVertix || addingEdge) && (event.toElement.tagName == 'CANVAS')){
+	}else if((removingEdge || removingVertix || addingEdge || subdivisioning) && (event.toElement.tagName == 'CANVAS')){
 		deactivateCurrentAction();
 	}
 }
 
 function deactivateCurrentAction(){
-	removingEdge = removingVertix = addingEdge = false;
+	removingEdge = removingVertix = addingEdge = subdivisioning = false;
 	selectedVertix = -1;
 	representation.status = '';
 	representation.drawGraph();

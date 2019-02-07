@@ -220,22 +220,26 @@ class GraphRepresentation{
 		return -1;
 	}
 
-	addVertix(){
+	addVertix(vector = this.getCenter()){
 		const graphCenter = createVector(window.innerWidth/2, window.innerHeight/2);
-		function sum(total,currentValue, index,arr){
+		function sum(total, currentValue, index, arr){
 			return total + (graphCenter.dist(currentValue)/arr.length);
 		}
 		let averageDistance = this.centers.reduce(sum, 0);
-		let vector = 0;
-		do{
+		while(this.vectorOnVertix(vector, 2*vertixRadius) != -1){
 			vector = createVector((graphCenter.x+((Math.random()*2)-1)*averageDistance)+50,(graphCenter.y+((Math.random()*2)-1)*averageDistance)+50);
-		}while(this.vectorOnVertix(vector, 2*vertixRadius) != -1);
+		}
+		
 		this.centers.push(vector);
 	}
 
 	removeVertix(i){
 		this.centers.splice(i,1);
 		this.ids.splice(i,1);
+	}
+
+	getCenter(){
+		return vectorMean(this.centers);
 	}
 
 	toString(){
@@ -265,4 +269,15 @@ class GraphRepresentation{
 		this.ids = rows[2].split(',');
 		return this;
 	}
+}
+
+function vectorMean(vectors){
+	var x = 0;
+	var y = 0;
+	
+	vectors.forEach(function(vector){
+		x += vector.x;
+		y += vector.y;
+	});
+	return createVector(x/vectors.length, y/vectors.length);
 }

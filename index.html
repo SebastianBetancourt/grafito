@@ -42,6 +42,24 @@
     </div>
 
 
+    <div id="warshall">
+      <div onclick="event.stopPropagation()" style="display: flex;flex-direction: column;justify-content: center;align-items:center;">
+        <div id="warshallLabel" style="font-family: serif; text-align: center;"></div>
+        <div id="warshallMatrix" style="margin: 10pt"></div>
+        <div id="predecessorsLabel" style="font-family: serif; text-align: center;"></div>
+        <div id="predecessorsMatrix" style="margin: 10pt; margin-bottom: 20pt;"></div>
+        <span>
+        <span style="right: 0%;margin: 10pt; ">
+          <button id="previous" type="button"><<</button>
+        </span>
+        <span style="right: 100%;margin: 10pt; ">
+          <button id="next" type="button">>></button>
+        </span>
+      </span>
+      </div>
+    </div>
+
+
     <div id="info" >
       <a id="toggleWMatrix" style="font-size: 7pt" href="javascript:toggleWMatrix()">[hide weight matrix]</a>
        <div id="wSection">
@@ -64,6 +82,10 @@
       </span>
       <span id="typeOfGraph"></span>
       <span id="degreeSequence"></span>
+      <span id="separator">  </span>
+      <span id="eulerInvariants"></span>
+      <span id="eulerPath"></span>
+      <span id="HamiltonPath"></span>
     </div>
   </body>
 </html>
