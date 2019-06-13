@@ -361,6 +361,9 @@ function wCellBlurred(cell){
 		representation.ids[i-1] = cell.textContent;
 	}else{
 		graph.wMatrix.setValue(i-1, j-1, parseInt(cell.textContent));
+		if(graph instanceof UndirectedGraph){
+			graph.wMatrix.setValue(j-1, i-1, parseInt(cell.textContent));
+		}
 	}
 	updateInfo();
 	representation.drawGraph();
@@ -418,9 +421,7 @@ function warshall(){
 	var div = document.getElementById('warshall');
 	div.style.display = 'flex';
 	
-	if(!graph.warshalls || !graph.warshalls.length){
-		graph.computeWarshall();
-	}
+	graph.computeWarshall();
 
 	function hideDiv(){		
 		div.style.display = 'none';

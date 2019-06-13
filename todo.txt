@@ -14,10 +14,8 @@ given a graph, calculate:
 	//node degree, indegree, outdegree
 	//degree sequence
 	//type
-matrix calc:
-	adj matrix to the n binary power
-	warshall algorithm
+//warshall algorithm
 //generate graph:
 	//k, c, w and k bipartite
-elementary subdivisions
-check isomorphism invariants
+//elementary subdivisions
+

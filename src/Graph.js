@@ -105,6 +105,9 @@ class Graph {
 	}
 
 	computeWarshall(n = this.getVertixCount()){
+		if(graph.warshalls && graph.warshalls.length){
+			return;
+		}
 		//predecessors
 		var firstPredecessor = new Matrix(this.getVertixCount());
 		for (var i = 0; i < this.getVertixCount(); i++) {

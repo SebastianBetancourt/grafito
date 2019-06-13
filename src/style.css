@@ -82,3 +82,8 @@ body {
 	justify-content: center; 
 	align-items: center;
 }
+
+.separator{
+	min-height: 15px;
+	min-width: 15px;
+}
