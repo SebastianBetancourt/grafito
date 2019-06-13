@@ -297,6 +297,7 @@ function toggleAdjMatrix(){
 // weight matrix
 
 function updateTableWMatrix(){
+
 	if(graph.hasMultipleEdges()){
 		// show weights checkbox
 		document.getElementById('showWeights').style.display = 'none';
@@ -306,7 +307,7 @@ function updateTableWMatrix(){
 
 	document.getElementById('showWeights').style.display = 'inline';
 	document.getElementById('showWeightsLabel').style.display = 'inline';
-
+	graph.updateWeightMatrix();
 	var table = [[' '].concat(representation.ids.slice(0, graph.getVertixCount()))];
 	for (var i = 0; i < graph.getVertixCount(); i++) {
 		table.push([representation.ids[i]]);
@@ -426,18 +427,23 @@ function warshall(){
 	function hideDiv(){		
 		div.style.display = 'none';
 		div.removeEventListener('click', hideDiv);
+
 	}
 	
 	var k = graph.getVertixCount();
-	
 	checkButtons();
 	printMatrices();
 
 	function checkButtons(){
-		if(k >= graph.getVertixCount()){
+		if(graph.getVertixCount() == 1){
 			document.getElementById('next').disabled = true;
+			document.getElementById('previous').disabled = true;
+		}else if(k >= graph.getVertixCount()){
+			document.getElementById('next').disabled = true;
+			document.getElementById('previous').disabled = false;
 		}else if(k <= 0){
 			document.getElementById('previous').disabled = true;
+			document.getElementById('next').disabled = false;
 		}else{
 			document.getElementById('next').disabled = false;
 			document.getElementById('previous').disabled = false;
@@ -473,8 +479,8 @@ function warshall(){
 			}
 		}
 
-		document.getElementById('warshallLabel').innerHTML = 'D<sup>('+String(k)+')</sup>';
-		document.getElementById('predecessorsLabel').innerHTML = '&pi;<sup>('+String(k)+')</sup>';
+		document.getElementById('warshallLabel').innerHTML = 'W<sup>('+String(k)+')</sup>';
+		document.getElementById('predecessorsLabel').innerHTML = 'P<sup>('+String(k)+')</sup>';
 
 		var codeWarshall = '<table id="warshallTable" style="float:center">';
 		var codePredecessor = '<table id="predecessorsTable" style="float:center">';

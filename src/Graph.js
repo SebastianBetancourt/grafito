@@ -119,9 +119,9 @@ class Graph {
 					}
 				}
 			}
-		this.warshallPredecessors = [firstPredecessor]
+		this.warshallPredecessors = [firstPredecessor];
 
-		this.warshalls = [this.wMatrix];
+		this.warshalls = [this.wMatrix, this.wMatrix];
 
 		//algorithm
 		for (var k = 1; k <= n; k++) {
