@@ -149,6 +149,27 @@ class Graph {
 		this.addEdge(lastVertix,to);
 	}
 
+	generateComplement(){
+		var adjMatrix = new Matrix(this.getVertixCount());
+		for (var i = 0; i < this.getVertixCount(); i++) {
+			for (var j = 0; j < this.getVertixCount(); j++) {
+				if(i == j){
+					adjMatrix.setValue(i,j, this.adjMatrix.getValue(i, j));
+				}else if(this.adjMatrix.getValue(i, j) > 0){
+					adjMatrix.setValue(i,j, 0);
+				} else {
+					adjMatrix.setValue(i,j, 1);
+				}
+			}
+		}
+
+		if(this instanceof DirectedGraph){
+			return new DirectedGraph(adjMatrix);
+		}else{
+			return new UndirectedGraph(adjMatrix);
+		}
+	}
+
 }
 
 class UndirectedGraph extends Graph {
@@ -159,11 +180,11 @@ class UndirectedGraph extends Graph {
 
 	getType(){
 		if(super.hasMultipleEdges() && super.hasLoops()){
-			return 'pseudograph';
+			return 'Pseudografo';
 		}else if (super.hasMultipleEdges()){
-			return 'multigraph';
+			return 'Multigrafo';
 		}else{
-			return 'simple graph';
+			return 'Grafo simple';
 		}
 	}
 
@@ -259,10 +280,12 @@ class UndirectedGraph extends Graph {
 				break;
 		}
 		this.adjMatrix = new Matrix(matrix);
+		this.wMatrix = new Matrix(this.getVertixCount());
 		this.updateWeightMatrix();
 		return this;
 	}
 
+	
 }
 
 class DirectedGraph extends Graph {
@@ -273,9 +296,9 @@ class DirectedGraph extends Graph {
 
 	getType(){
 		if(super.hasMultipleEdges()){
-			return 'directed multigraph';
+			return 'Multigrafo dirijido';
 		}else{
-			return 'directed graph';
+			return 'Grafo dirijido';
 		}
 	}
 
@@ -309,6 +332,3 @@ class DirectedGraph extends Graph {
 	}
 
 }
-
-
-

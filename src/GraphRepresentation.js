@@ -21,7 +21,7 @@ class GraphRepresentation{
 	}
 
 	distributeVertices(){
-		const graphCenter = createVector(window.innerWidth/2, window.innerHeight/2);
+		var graphCenter = createVector(window.innerWidth/2, window.innerHeight/2);
 		//distributes the vertices equidistantly around a circle
 		// given the distance between two consecutive vertices (sideLength) as a chord, this calculates the needed radius for the underlaying circle
 		let radius = sideLength / (2*sin(PI/graph.getVertixCount()));

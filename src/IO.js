@@ -3,12 +3,12 @@ function initGUI(){
 	const margin = 5;
 	let y = margin;
 
-	button = createButton('new');
+	button = createButton('Nuevo grafo');
 	button.position(margin, y);
 	button.mousePressed(newGraph);
 	y += button.height+margin;
 
-	let fileButtons = [['open', openGraph], ['save', saveGraph]];
+	let fileButtons = [['Abrir', openGraph], ['Guardar', saveGraph]];
 
 	for (var i = 0; i < fileButtons.length; i++) {
 		button = createButton(fileButtons[i][0]);
@@ -20,10 +20,10 @@ function initGUI(){
 
 	y += margin;
 
-	let vertixButtons = [['add', addVertix], ['remove', removeVertix]];
+	let vertixButtons = [['Añadir', addVertix], ['Eliminar', removeVertix]];
 
 	for (var i = 0; i < vertixButtons.length; i++) {
-		button = createButton(vertixButtons[i][0]+' vertix');
+		button = createButton(vertixButtons[i][0]+' vértice');
 		button.position(margin, y);
 		button.mousePressed(vertixButtons[i][1]);
 		y += button.height+margin;
@@ -31,10 +31,10 @@ function initGUI(){
 
 	y += margin;
 
-	let edgeButtons = [['add', addEdge], ['remove', removeEdge]];
+	let edgeButtons = [['Añadir', addEdge], ['Eliminar', removeEdge]];
 
 	for (var i = 0; i < edgeButtons.length; i++) {
-		button = createButton(edgeButtons[i][0]+' edge');
+		button = createButton(edgeButtons[i][0]+' arista');
 		button.position(margin, y);
 		button.mousePressed(edgeButtons[i][1]);
 		y += button.height+margin;
@@ -42,14 +42,14 @@ function initGUI(){
 
 	y += margin;
 
-	button = createButton('elementary subdivision');
+	button = createButton('Subdivisión elemental');
 	button.position(margin, y);
 	button.mousePressed(elementarySubdivision);
 	y += button.height+margin;
 
 	y += margin;
 
-	let algoButtons = [['complement', complement], ['floyd-warshall', warshall]];
+	let algoButtons = [['Complemento', complement], ['Calcular Warshall', warshall]];
 
 	for (var i = 0; i < edgeButtons.length; i++) {
 		button = createButton(algoButtons[i][0]);
@@ -57,6 +57,8 @@ function initGUI(){
 		button.mousePressed(algoButtons[i][1]);
 		y += button.height+margin;
 	}
+
+	window.addEventListener("resize", resize);
 
 }
 
@@ -200,6 +202,12 @@ function saveGraph(){
 	document.body.removeChild(element);
 }
 
+function resize(){
+	resizeCanvas(windowWidth-4, windowHeight-4);
+	representation.distributeVertices();
+	representation.drawGraph();
+}
+
 function updateInfo(){
 	graph.updateWeightMatrix();
 	updateTableWMatrix();
@@ -287,10 +295,10 @@ function toggleAdjMatrix(){
 	var state = document.getElementById('adjMatrix').style.display;
 	if(state == 'none'){
 		document.getElementById('adjMatrix').style.display = 'block';
-		document.getElementById('toggleAdjMatrix').innerHTML = '[hide adjacency matrix]';
+		document.getElementById('toggleAdjMatrix').innerHTML = '[Ocultar matriz de adyacencia]';
 	}else{
 		document.getElementById('adjMatrix').style.display = 'none';
-		document.getElementById('toggleAdjMatrix').innerHTML = '[show adjacency matrix]';
+		document.getElementById('toggleAdjMatrix').innerHTML = '[Mostrar matriz de adyacencia]';
 	}
 }
 
@@ -302,7 +310,7 @@ function updateTableWMatrix(){
 		// show weights checkbox
 		document.getElementById('showWeights').style.display = 'none';
 		document.getElementById('showWeightsLabel').style.display = 'none';
-		return '<span style="font-size: 8pt">weight matrix not available for multigraphs</span>';
+		return '<span style="font-size: 8pt">Matriz de pesos no disponible para multigrafos</span>';
 	}
 
 	document.getElementById('showWeights').style.display = 'inline';
@@ -375,10 +383,10 @@ function toggleWMatrix(){
 	var state = document.getElementById('wSection').style.display;
 	if(state == 'none'){
 		document.getElementById('wSection').style.display = 'block';
-		document.getElementById('toggleWMatrix').innerHTML = '[hide weight matrix]';
+		document.getElementById('toggleWMatrix').innerHTML = '[Ocultar matriz de pesos]';
 	}else{
 		document.getElementById('wSection').style.display = 'none';
-		document.getElementById('toggleWMatrix').innerHTML = '[show weight matrix]';
+		document.getElementById('toggleWMatrix').innerHTML = '[Mostrar matriz de pesos]';
 	}
 }
 
@@ -394,25 +402,7 @@ function updateDrawWeights(){
 }
 
 function complement(){
-	var adjMatrix = new Matrix(graph.getVertixCount());
-	for (var i = 0; i < graph.getVertixCount(); i++) {
-		for (var j = 0; j < graph.getVertixCount(); j++) {
-			if(i == j){
-				adjMatrix.setValue(i,j, graph.adjMatrix.getValue(i, j));
-			}else if(graph.adjMatrix.getValue(i, j) > 0){
-				adjMatrix.setValue(i,j, 0);
-			} else {
-				adjMatrix.setValue(i,j, 1);
-			}
-		}
-	}
-
-	if(graph instanceof DirectedGraph){
-		graph = new DirectedGraph(adjMatrix);
-	}else{
-		graph = new UndirectedGraph(adjMatrix);
-	}
-
+	graph = graph.generateComplement();
 	representation = new GraphRepresentation(representation.centers, representation.ids, representation.drawWeights);
 	representation.drawGraph();
 	updateInfo();
@@ -550,7 +540,7 @@ var subdivisioning = false;
 function removeVertix(){
 	deactivateCurrentAction();
 	removingVertix = true;
-	representation.status = 'removing vertix';
+	representation.status = 'Selecciona el vértice a eliminar';
 	representation.drawGraph();
 	updateInfo();
 }
@@ -558,7 +548,7 @@ function removeVertix(){
 function addEdge(){
 	deactivateCurrentAction();
 	addingEdge = true;
-	representation.status = 'adding edge';
+	representation.status = 'Selecciona los vértices a conectar';
 	representation.drawGraph();
 	updateInfo();
 }
@@ -566,7 +556,7 @@ function addEdge(){
 function removeEdge(){
 	deactivateCurrentAction();
 	removingEdge = true;
-	representation.status = 'removing edge';
+	representation.status = 'Selecciona los vértices a desconectar';
 	representation.drawGraph();
 	updateInfo();
 }
@@ -574,7 +564,7 @@ function removeEdge(){
 function elementarySubdivision(){
 	deactivateCurrentAction();
 	subdivisioning = true;
-	representation.status = 'elementary subdivisioning';
+	representation.status = 'Selecciona los vértices para crear un vértice entre ellos';
 	representation.drawGraph();
 	updateInfo();
 }
@@ -656,4 +646,3 @@ function mouseReleased(){
 	vertix = -1;
 	dragging = false;
 }
-

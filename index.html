@@ -18,25 +18,25 @@
   <body>
     <div id='new'>
       <div style="display: flex; flex-direction: column;" onclick="event.stopPropagation()">
-        <label><input type="radio" name="graphType" id="undirected" class="graphTypeRadio">blank undirected graph</label>
-        <label><input type="radio" name="graphType" id="directed" class="graphTypeRadio">blank directed graph</label>
-        <label style="display: flex;"><input type="radio" name="graphType" id="complete" class="graphTypeRadio">complete <div class="mathTypo"> K </div>
+        <label><input type="radio" name="graphType" id="undirected" class="graphTypeRadio">Grafo no dirijido en blanco</label>
+        <label><input type="radio" name="graphType" id="directed" class="graphTypeRadio">Grafo dirijido en blanco</label>
+        <label style="display: flex;"><input type="radio" name="graphType" id="complete" class="graphTypeRadio">Grafo completo<div class="mathTypo"> K </div>
           <input type="text" id="completeField" class="graphTypeField"></label>
-        <label style="display: flex;"><input type="radio" name="graphType" id="cycle" class="graphTypeRadio">cycle <div class="mathTypo"> C </div>
+        <label style="display: flex;"><input type="radio" name="graphType" id="cycle" class="graphTypeRadio">Ciclo <div class="mathTypo"> C </div>
           <input type="text" id="cycleField" class="graphTypeField"></label>
-        <label style="display: flex;"><input type="radio" name="graphType" id="wheel" class="graphTypeRadio">wheel <div class="mathTypo"> W </div>
+        <label style="display: flex;"><input type="radio" name="graphType" id="wheel" class="graphTypeRadio">Rueda <div class="mathTypo"> W </div>
          <input type="text" id="wheelField" class="graphTypeField"></label>
-        <label style="display: flex;"><input type="radio" name="graphType" id="bipartite" class="graphTypeRadio">complete bipartite <div class="mathTypo"> K 
+        <label style="display: flex;"><input type="radio" name="graphType" id="bipartite" class="graphTypeRadio">Bipartito completo <div class="mathTypo"> K 
          <input type="text" id="set1" class="graphTypeField">,
          <input type="text" id="set2" class="graphTypeField">
         </div></label>
-        <button type="button" id="generate" style="width: 65px">generate</button>
+        <button type="button" id="generate" style="width: 65px">Generar</button>
       </div>
     </div>
 
     <div id="fileOpener">
       <div onclick="event.stopPropagation()" style="display: flex;flex-direction: column;justify-content: center;align-items:center;">
-      <label for="fileinput">choose a *.graph file to load from:</label>
+      <label for="fileinput">Seleccione un archivo *.graph para cargar:</label>
         <div><input type="file" id="fileinput" name="fileinput" accept=".graph"></div>
       </div>
     </div>
@@ -61,13 +61,13 @@
 
 
     <div id="info" >
-      <a id="toggleWMatrix" style="font-size: 7pt" href="javascript:toggleWMatrix()">[hide weight matrix]</a>
+      <a id="toggleWMatrix" style="font-size: 7pt" href="javascript:toggleWMatrix()">[Ocultar matriz de pesos]</a>
        <div id="wSection">
-        <input type="checkbox" id="showWeights" onclick="updateDrawWeights()"><label for="showWeights" id="showWeightsLabel" style="font-size: 8pt">show weights</label><br>
+        <input type="checkbox" id="showWeights" onclick="updateDrawWeights()"><label for="showWeights" id="showWeightsLabel" style="font-size: 8pt">Mostrar pesos en grafo</label><br>
        <span id="wMatrix"></span>
       </div>
       <div style="min-height: 20pt"></div>
-      <a id="toggleAdjMatrix" style="font-size: 7pt" href="javascript:toggleAdjMatrix()">[hide adjacency matrix]</a>
+      <a id="toggleAdjMatrix" style="font-size: 7pt" href="javascript:toggleAdjMatrix()">[Ocultar matriz de adyacencia]</a>
       <span id="adjMatrix"></span>
       <span id="status" style="min-height: 20px;"> </span>
       <span>
