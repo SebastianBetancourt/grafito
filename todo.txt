@@ -18,4 +18,5 @@ given a graph, calculate:
 //generate graph:
 	//k, c, w and k bipartite
 //elementary subdivisions
+//hola
 
