@@ -19,4 +19,5 @@ given a graph, calculate:
 	//k, c, w and k bipartite
 //elementary subdivisions
 //hola
+//chao
 
